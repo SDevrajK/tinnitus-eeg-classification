@@ -1,0 +1,15 @@
+# Personal memory/context state (BBmem) — not part of the project
+.memory/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data lives on the 10TB HDD, outside this repo — no data files should ever be tracked
+*.gdf
+*.fdt
+*.set
+*.npz
+*.zip
+*.mat
