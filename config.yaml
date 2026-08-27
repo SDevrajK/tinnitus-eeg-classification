@@ -186,3 +186,16 @@ excluded_subjects_montage:
     - P18G2
     - P4G5
     - P5G5
+
+# Quality-control figure generation (PRD FR12 / AC6).
+# Sample N subjects per (dataset, group) and plot their PSD.
+qc:
+  n_subjects_per_group: 2
+  fmin: 1.0
+  fmax: 50.0
+  bands:
+    delta: [0.5, 4.0]
+    theta: [4.0, 8.0]
+    alpha: [8.0, 13.0]
+    beta: [13.0, 30.0]
+    gamma: [30.0, 45.0]
