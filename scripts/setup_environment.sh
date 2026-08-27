@@ -5,7 +5,7 @@
 
 set -euo pipefail
 
-ENV_NAME="eeg-processor"
+ENV_NAME="tinnitus-eeg"
 ENV_YAML="$(dirname "$0")/../environment.yml"
 EEG_PROCESSOR_PATH="/home/sdevrajk/projects/personal/eeg-processor"
 CONDA_BIN="conda"

@@ -2,7 +2,7 @@
 # After creating this environment, install the eeg-processor package in editable mode:
 #   pip install -e /home/sdevrajk/projects/personal/eeg-processor
 
-name: eeg-processor
+name: tinnitus-eeg
 channels:
   - conda-forge
   - defaults
