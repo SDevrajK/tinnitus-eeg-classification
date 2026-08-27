@@ -152,3 +152,37 @@ channel_mapping:
 # seconds below which a subject is excluded from all downstream processing.
 # Grounded in PRD §2 (Dataset D subsection). Default 90 s (= 45 epochs at 2 s).
 min_duration_sec: 90
+
+# Per-dataset processing flag: whether the dataset is already preprocessed
+# (already-preprocessed datasets skip filtering/artifact-rejection and only get
+# channel standardization + epoch handling). Set from PRD §2.
+datasets:
+  torres_torres:
+    preprocessed: false
+  ibarra_zarate:
+    preprocessed: false
+  raeisi:
+    preprocessed: false
+  wang:
+    preprocessed: true
+
+# Unified preprocessing parameters (all configurable; no hardcoded values).
+# Bandpass 0.5-45 Hz preserves all five canonical bands (delta 0.5-4, theta 4-8,
+# alpha 8-13, beta 13-30, gamma 30-45); 50 Hz notch removes line noise.
+preprocessing:
+  l_freq: 0.5
+  h_freq: 45.0
+  notch_freq: 50.0
+  epoch_length_sec: 2.0
+  reject_ptp_median_multiple: 3.0
+  flat_eeg_v: 1e-6
+
+# Subjects excluded for non-standard channel montage. These use a different
+# electrode layout (fronto-central subset) that cannot be reduced to the 13
+# shared channels, so they are excluded from the unified database.
+# Verified from their .set channel labels (Dataset B).
+excluded_subjects_montage:
+  ibarra_zarate:
+    - P18G2
+    - P4G5
+    - P5G5
