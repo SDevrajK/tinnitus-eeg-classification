@@ -209,10 +209,10 @@ frequency_bands:
   gamma: [30.0, 45.0]
 
 welch_psd:
-  # Welch PSD parameters for Phase 3 band-power extraction, configurable rather than hardcoded
+  # Welch PSD parameters for Phase 3 band-power extraction.
+  # n_fft and n_overlap are derived per dataset from window_sec * sfreq (sfreq varies: 250/256/1200 Hz)
   window_sec: 1.0
   overlap: 0.5
-  n_fft: 250
 
 plzc:
   # PLZC permutation-embedding parameters for Phase 3 complexity extraction
