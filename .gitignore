@@ -13,6 +13,12 @@ __pycache__/
 *.npz
 *.zip
 *.mat
+*.fif
+
+# Guard against a stray data/ directory ever being created in the repo root
+# (e.g. a script run with a relative path instead of the HDD path — this has
+# happened once already; see specs/tinnitus-eeg-interpretability/phase2/audit.md)
+/data/
 
 # all specs are gitignored
 specs/
