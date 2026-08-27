@@ -11,6 +11,7 @@ DERIVATIVES_DIR = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLe
 PREPROCESSED_DIR = DERIVATIVES_DIR / "preprocessed"
 SHARED_CHANNELS_PATH = DERIVATIVES_DIR / "shared_channels.json"
 INVENTORY_CSV = BIDS_ROOT / "inventory.csv"
+FEATURES_DIR = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data/features")
 
 
 def load_config() -> dict:

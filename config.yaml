@@ -199,3 +199,23 @@ qc:
     alpha: [8.0, 13.0]
     beta: [13.0, 30.0]
     gamma: [30.0, 45.0]
+
+# Canonical five-band definition for Phase 3 feature extraction.
+frequency_bands:
+  delta: [0.5, 4.0]
+  theta: [4.0, 8.0]
+  alpha: [8.0, 13.0]
+  beta: [13.0, 30.0]
+  gamma: [30.0, 45.0]
+
+welch_psd:
+  # Welch PSD parameters for Phase 3 band-power extraction, configurable rather than hardcoded
+  window_sec: 1.0
+  overlap: 0.5
+  n_fft: 250
+
+plzc:
+  # PLZC permutation-embedding parameters for Phase 3 complexity extraction
+  # (motif length m and time delay τ), configurable rather than hardcoded
+  motif_length: 3
+  time_delay: 1
