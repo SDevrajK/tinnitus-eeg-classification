@@ -10,7 +10,6 @@ This follows standard band-pass filtering and epoching practice (DOI: 10.3389/fn
 """
 
 from pathlib import Path
-import yaml
 import numpy as np
 import mne
 import csv
@@ -18,27 +17,10 @@ from eeg_processor.processing.filtering import filter_data
 from eeg_processor.processing.artifact import detect_bad_channels
 from eeg_processor.processing.reject_epochs import reject_bad_epochs
 
+from _common import BIDS_ROOT, DERIVATIVES_DIR, PREPROCESSED_DIR, load_config, load_shared_channels
+
 # Module-level constants
-PROJECT_ROOT = Path("/home/sdevrajk/projects/personal/MachineLearning")
-CONFIG_PATH = PROJECT_ROOT / "config.yaml"
-BIDS_ROOT = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data/bids_organized")
-DERIVATIVES_DIR = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data/derivatives")
-SHARED_CHANNELS_PATH = DERIVATIVES_DIR / "shared_channels.json"
-PREPROCESSED_DIR = DERIVATIVES_DIR / "preprocessed"
 RAW_DATASET_KEYS = ("torres_torres", "ibarra_zarate", "raeisi")  # parent 4 handles raw datasets only
-
-
-def load_config() -> dict:
-    """Load the central configuration from YAML."""
-    with open(CONFIG_PATH, 'r') as f:
-        return yaml.safe_load(f)
-
-
-def load_shared_channels() -> list[str]:
-    """Load the list of shared channels from JSON."""
-    with open(SHARED_CHANNELS_PATH, 'r') as f:
-        data = yaml.safe_load(f)
-        return data['shared_channels']
 
 
 def load_excluded_montage(config) -> dict:

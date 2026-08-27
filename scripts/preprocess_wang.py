@@ -7,35 +7,16 @@ an empty event array in the .set file, so a custom loader is used.
 
 Channel standardization is performed using the mapping defined in config.yaml.
 """
-from pathlib import Path
 import scipy.io
 import numpy as np
 import mne
-import yaml
 import csv
-import json
+
+from _common import BIDS_ROOT, DERIVATIVES_DIR, PREPROCESSED_DIR, load_config, load_shared_channels
 
 # Constants
-PROJECT_ROOT = Path("/home/sdevrajk/projects/personal/MachineLearning")
-CONFIG_PATH = PROJECT_ROOT / "config.yaml"
-BIDS_ROOT = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data/bids_organized")
-DERIVATIVES_DIR = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data/derivatives")
-SHARED_CHANNELS_PATH = DERIVATIVES_DIR / "shared_channels.json"
-PREPROCESSED_DIR = DERIVATIVES_DIR / "preprocessed"
 EXCLUDED_CSV = DERIVATIVES_DIR / "excluded_subjects.csv"
 DATASET_KEY = "wang"
-
-def load_config() -> dict:
-    """Load configuration from YAML file."""
-    with open(CONFIG_PATH, 'r') as f:
-        return yaml.safe_load(f)
-
-def load_shared_channels() -> list[str]:
-    """Load the list of shared channels from JSON."""
-    with open(SHARED_CHANNELS_PATH, 'r') as f:
-        data = json.load(f)
-        # Extract the shared_channels list from the dictionary
-        return data['shared_channels']
 
 def load_excluded_subject_ids() -> set[str]:
     """Load excluded subject IDs from CSV file for Dataset D."""

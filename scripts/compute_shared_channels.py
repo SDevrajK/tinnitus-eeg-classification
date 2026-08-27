@@ -4,21 +4,17 @@ Compute the intersection of standardized channel names across all four datasets
 and write shared_channels.json with the final shared channel list and count.
 """
 
-from pathlib import Path
-import yaml
 import json
 
+from _common import CONFIG_PATH, DERIVATIVES_DIR, load_config
+
 # Named constants
-PROJECT_ROOT = Path("/home/sdevrajk/projects/personal/MachineLearning")
-CONFIG_PATH = PROJECT_ROOT / "config.yaml"
-DERIVATIVES_DIR = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data/derivatives")
 OUTPUT_PATH = DERIVATIVES_DIR / "shared_channels.json"
 DATASET_KEYS = ("torres_torres", "ibarra_zarate", "raeisi", "wang")
 
 def main():
     # Load config
-    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-        config = yaml.safe_load(f)
+    config = load_config()
     
     channel_mapping = config["channel_mapping"]
     

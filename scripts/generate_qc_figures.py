@@ -3,7 +3,6 @@ Generate quality-control PSD figures for a sample of subjects per dataset and gr
 """
 
 from pathlib import Path
-import yaml
 import csv
 from collections import defaultdict
 import numpy as np
@@ -12,20 +11,10 @@ matplotlib.use("Agg")  # Use non-interactive Agg backend for headless saving
 import matplotlib.pyplot as plt
 import mne
 
-PROJECT_ROOT = Path("/home/sdevrajk/projects/personal/MachineLearning")
-CONFIG_PATH = PROJECT_ROOT / "config.yaml"
-BIDS_ROOT = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data/bids_organized")
-DERIVATIVES_DIR = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data/derivatives")
-PREPROCESSED_DIR = DERIVATIVES_DIR / "preprocessed"
-INVENTORY_CSV = BIDS_ROOT / "inventory.csv"
+from _common import PROJECT_ROOT, PREPROCESSED_DIR, INVENTORY_CSV, load_config
+
 FIGURES_DIR = PROJECT_ROOT / "specs" / "tinnitus-eeg-interpretability" / "phase2" / "figures"
 DATASET_KEYS = ("torres_torres", "ibarra_zarate", "raeisi", "wang")
-
-
-def load_config() -> dict:
-    """Load configuration from YAML file."""
-    with open(CONFIG_PATH, "r") as f:
-        return yaml.safe_load(f)
 
 
 def load_group_map() -> dict[str, str]:

@@ -2,27 +2,22 @@
 """
 Exclude subjects whose retained recording duration is below the configurable minimum threshold.
 """
-from pathlib import Path
 import csv
-import yaml
 
-PROJECT_ROOT = Path("/home/sdevrajk/projects/personal/MachineLearning")
-CONFIG_PATH = PROJECT_ROOT / "config.yaml"
-INVENTORY_PATH = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data/bids_organized/inventory.csv")
-DERIVATIVES_DIR = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data/derivatives")
+from _common import DERIVATIVES_DIR, INVENTORY_CSV, load_config
+
 OUTPUT_PATH = DERIVATIVES_DIR / "excluded_subjects.csv"
 
 def main():
     # Load config
-    with open(CONFIG_PATH, "r") as f:
-        config = yaml.safe_load(f)
+    config = load_config()
     
     threshold = float(config["min_duration_sec"])
     
     # Read inventory.csv and filter subjects
     excluded_subjects = []
     
-    with open(INVENTORY_PATH, "r") as f:
+    with open(INVENTORY_CSV, "r") as f:
         reader = csv.DictReader(f)
         total_subjects = 0
         
