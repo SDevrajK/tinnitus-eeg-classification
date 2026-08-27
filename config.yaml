@@ -147,3 +147,8 @@ channel_mapping:
     E70: O1
     E83: O2
     Cz: Cz
+
+# Minimum retained (post-artifact-rejection) resting-state recording length in
+# seconds below which a subject is excluded from all downstream processing.
+# Grounded in PRD §2 (Dataset D subsection). Default 90 s (= 45 epochs at 2 s).
+min_duration_sec: 90
