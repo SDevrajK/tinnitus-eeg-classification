@@ -13,3 +13,6 @@ __pycache__/
 *.npz
 *.zip
 *.mat
+
+# all specs are gitignored
+specs/
