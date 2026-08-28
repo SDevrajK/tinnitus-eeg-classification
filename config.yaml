@@ -167,11 +167,16 @@ datasets:
     preprocessed: true
 
 # Unified preprocessing parameters (all configurable; no hardcoded values).
-# Bandpass 0.5-45 Hz preserves all five canonical bands (delta 0.5-4, theta 4-8,
-# alpha 8-13, beta 13-30, gamma 30-45); 50 Hz notch removes line noise.
+# Bandpass 0.5-45 Hz preserves all five canonical bands as analyzed by the raw
+# preprocessing step (delta 0.5-4, theta 4-8, alpha 8-13, beta 13-30, gamma
+# 30-45); 50 Hz notch removes line noise. NOTE: the feature-extraction stage
+# (frequency_bands below) analyzes delta starting at 1.0 Hz, not 0.5 Hz — see
+# that block's comment. This preprocessing filter is intentionally wider than
+# the feature-extraction floor so it never clips anything the feature stage
+# might need.
 preprocessing:
-  l_freq: 1.0
-  h_freq: 40.0
+  l_freq: 0.5
+  h_freq: 45.0
   notch_freq: 50.0
   epoch_length_sec: 2.0
   reject_ptp_median_multiple: 3.0
@@ -205,8 +210,12 @@ qc:
     gamma: [30.0, 45.0]
 
 # Canonical five-band definition for Phase 3 feature extraction.
+# delta's lower edge is 1.0 Hz, not the textbook 0.5 Hz: a 2-second epoch has
+# 0.5 Hz frequency resolution, so 0.5 Hz is exactly one cycle across the whole
+# epoch and too unstable to estimate reliably; 1.0 Hz gives two full cycles
+# per epoch, the minimum for a usable estimate.
 frequency_bands:
-  delta: [0.5, 4.0]
+  delta: [1.0, 4.0]
   theta: [4.0, 8.0]
   alpha: [8.0, 13.0]
   beta: [13.0, 30.0]

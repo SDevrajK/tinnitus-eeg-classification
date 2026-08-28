@@ -94,7 +94,17 @@ def load_wang_epochs(subject_id: str, config: dict) -> mne.Epochs:
     
     # Enforce the canonical shared channel order
     epochs = epochs.reorder_channels(shared)
-    
+
+    # Harmonize with datasets A/B/C: Wang et al. (2023)'s own pipeline bandpassed
+    # this data at 0.5-80 Hz (vs. our 0.5-45 Hz for A/B/C), and PLZC (unlike the
+    # band-power features) is computed on the full broadband epoch signal, so
+    # the extra 45-80 Hz content this dataset alone retains was inflating its
+    # PLZC relative to the other three (see Phase 3 audit, Finding 3). Apply an
+    # additional lowpass, reusing preprocessing.h_freq as the single source of
+    # truth for the shared upper edge rather than a second hardcoded 45.0. No
+    # highpass is added: Wang's existing 0.5 Hz low edge already matches ours.
+    epochs.filter(l_freq=None, h_freq=config['preprocessing']['h_freq'], verbose=False)
+
     return epochs
 
 def save_wang_epochs(epochs, subject_id) -> int:
