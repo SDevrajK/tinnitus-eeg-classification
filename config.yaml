@@ -170,12 +170,16 @@ datasets:
 # Bandpass 0.5-45 Hz preserves all five canonical bands (delta 0.5-4, theta 4-8,
 # alpha 8-13, beta 13-30, gamma 30-45); 50 Hz notch removes line noise.
 preprocessing:
-  l_freq: 0.5
-  h_freq: 45.0
+  l_freq: 1.0
+  h_freq: 40.0
   notch_freq: 50.0
   epoch_length_sec: 2.0
   reject_ptp_median_multiple: 3.0
   flat_eeg_v: 1e-6
+  # Target sampling rate: datasets above this (raeisi, native 1200 Hz) are
+  # downsampled to it BEFORE filtering/artifact-rejection so τ=1 sample means
+  # a consistent physical time lag across datasets.
+  resample_sfreq: 256.0
 
 # Subjects excluded for non-standard channel montage. These use a different
 # electrode layout (fronto-central subset) that cannot be reduced to the 13

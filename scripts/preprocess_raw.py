@@ -111,6 +111,13 @@ def _load_raeisi(eeg_file: Path, config: dict) -> mne.io.Raw:
     # Note: .npz files store EEG in microvolts (µV), not volts (V)
     raw = mne.io.RawArray(arr.copy().astype(np.float64) / 1e6, mne.create_info(ch_names=names, sfreq=1200.0, ch_types='eeg'), verbose=False)
     
+    # Downsample to the common target rate BEFORE any other preprocessing
+    # (filtering/artifact-rejection/epoching), so the permutation time delay τ
+    # (in samples) corresponds to a consistent physical lag across datasets.
+    # mne.io.Raw.resample applies an anti-aliasing low-pass filter automatically.
+    target_sfreq = float(config['preprocessing']['resample_sfreq'])
+    if raw.info['sfreq'] != target_sfreq:
+        raw.resample(target_sfreq)
     return raw
 
 
