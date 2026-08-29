@@ -3,6 +3,7 @@
 from pathlib import Path
 import yaml
 import json
+import pandas as pd
 
 PROJECT_ROOT = Path("/home/sdevrajk/projects/personal/MachineLearning")
 CONFIG_PATH = PROJECT_ROOT / "config.yaml"
@@ -24,3 +25,18 @@ def load_shared_channels() -> list[str]:
     """Load the list of shared channels from JSON."""
     with open(SHARED_CHANNELS_PATH, "r", encoding="utf-8") as f:
         return json.load(f)["shared_channels"]
+
+# Phase 4: fixed seed for permutation tests, bootstrap resampling, and model init (PRD §6)
+RANDOM_SEED = 42
+
+# Phase 4: seed for subject-stratified epoch capping in LODO training (PRD §6, configurable)
+EPOCH_DROP_SEED = 42
+
+PHASE4_DIR = PROJECT_ROOT / "specs" / "tinnitus-eeg-interpretability" / "phase4"
+RESULTS_DIR = PROJECT_ROOT / "results"
+FIGURES_DIR = PROJECT_ROOT / "figures"
+
+def load_features(dataset_key: str) -> "pd.DataFrame":
+    """Load full feature matrix for a dataset."""
+    path = FEATURES_DIR / f"{dataset_key}_features.parquet"
+    return pd.read_parquet(path)
