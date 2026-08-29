@@ -13,6 +13,7 @@ PREPROCESSED_DIR = DERIVATIVES_DIR / "preprocessed"
 SHARED_CHANNELS_PATH = DERIVATIVES_DIR / "shared_channels.json"
 INVENTORY_CSV = BIDS_ROOT / "inventory.csv"
 FEATURES_DIR = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data/features")
+SCALED_FEATURES_DIR = FEATURES_DIR / "scaled"
 
 
 def load_config() -> dict:
@@ -40,3 +41,8 @@ def load_features(dataset_key: str) -> "pd.DataFrame":
     """Load full feature matrix for a dataset."""
     path = FEATURES_DIR / f"{dataset_key}_features.parquet"
     return pd.read_parquet(path)
+
+
+def load_scaled_features(dataset_key: str) -> "pd.DataFrame":
+    """Load the robust-scaled feature matrix for one dataset (full DataFrame incl. meta cols)."""
+    return pd.read_parquet(SCALED_FEATURES_DIR / f"{dataset_key}_scaled.parquet")
