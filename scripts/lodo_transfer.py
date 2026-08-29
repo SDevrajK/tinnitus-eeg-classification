@@ -61,13 +61,13 @@ def make_model(alpha, l1_ratio, max_iter, tol):
 
 def main():
     config = load_config()
-    epoch_cap = int(config["phase4"]["epoch_cap"])
+    epoch_cap = int(config["phase4"]["epoch_cap"])  # 90 preserves ~100% of Datasets A/B while trimming the long tails of C/D (PRD FR13)
     max_iter = int(config["tier1"]["elastic_net"]["max_iter"])
     tol = float(config["tier1"]["elastic_net"]["tol"])
     
-    # FIXED LODO hyperparameters (documented reference config)
-    LODO_ALPHA = 0.001
-    LODO_L1_RATIO = 0.5
+    # LODO hyperparameters read from config (reference values; see config.yaml tier1.lodo)
+    LODO_ALPHA = float(config["tier1"]["lodo"]["alpha"])
+    LODO_L1_RATIO = float(config["tier1"]["lodo"]["l1_ratio"])
     
     rows = []
     for held_out in DATASET_KEYS:

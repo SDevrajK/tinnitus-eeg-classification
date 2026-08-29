@@ -4,6 +4,13 @@ Evaluate Tier 1 elastic-net model within each dataset under naive vs. LOSO CV sc
 This script compares cross-validation performance between naive epoch-level splitting
 and corrected Leave-One-Subject-Out (LOSO) cross-validation methods. It uses already-
 tuned hyperparameters from Task 3 and computes balanced accuracy and AUC-ROC metrics.
+
+Why naive epoch-level splitting is leaky: epochs from the same subject share
+subject-specific signal (notably, the wPLI features are literally identical across a
+subject's epochs), so when a subject's epochs are split across train and test folds,
+the classifier can partly learn subject identity rather than the tinnitus/control
+class — inflating the score. LOSO removes this by keeping all of a subject's epochs
+together in a single fold, so no subject appears in both train and test.
 """
 
 import warnings
