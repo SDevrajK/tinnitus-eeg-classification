@@ -43,7 +43,7 @@ def main():
         # Create boxplot
         fig, ax = plt.subplots(figsize=(10, 6))
         channel_data = [features[:, c] for c in range(features.shape[1])]
-        ax.boxplot(channel_data, labels=epochs.ch_names)
+        ax.boxplot(channel_data, tick_labels=epochs.ch_names)
         
         # Set labels and title
         ax.set_title(f"{dataset_key} — {subject_id} PLZC per channel")
