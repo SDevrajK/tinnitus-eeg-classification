@@ -328,3 +328,6 @@ tier3:
     kernel_length: 64          # temporal kernel length in samples
     drop_prob: 0.25            # dropout probability
     pool_mode: mean            # temporal pooling mode
+  interpretability:
+    ig_n_steps: 50             # Integrated Gradients approximation steps
+    n_saliency_epochs: 100     # epochs sampled per dataset for saliency aggregation
