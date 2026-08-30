@@ -304,3 +304,7 @@ tier2:
     gamma_grid: ["scale", 0.01, 0.1]
     class_weight: balanced
     probability: true
+  importance:
+    n_repeats: 10             # permutation-importance repeats for the RBF SVM
+    scoring: balanced_accuracy  # metric decreased by permutation (used for SVM importance)
+    top_k: 20                 # number of top features to map/visualize per model+dataset (used by later subtasks)
