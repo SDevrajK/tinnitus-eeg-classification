@@ -282,3 +282,25 @@ tier1:
   lodo:
     alpha: 0.001     # fixed LODO training-pool regularization strength (reference config)
     l1_ratio: 0.5    # fixed LODO training-pool elastic-net mix (reference config)
+
+# Tier 2 (Random Forest + RBF SVM) configurable parameters — no hardcoded values.
+# Nested cross-validation mirrors the Tier 1 scheme: GroupKFold (grouped by
+# Subject_ID) with `cv_folds` splits in BOTH the inner (hyperparameter search)
+# and outer (performance estimate) loops. `scoring` is the metric optimized by
+# the inner GridSearchCV. Both models use balanced class weights because the
+# four datasets have imbalanced tinnitus/control ratios (PRD §7).
+tier2:
+  cv_folds: 5                  # GroupKFold folds for nested CV (inner and outer)
+  scoring: balanced_accuracy   # metric optimized by the inner grid search
+  n_jobs: -1                   # parallel workers for grid search (-1 = all cores)
+  random_forest:
+    n_estimators_grid: [200, 500]
+    max_depth_grid: [10, 20, 30, null]
+    min_samples_leaf_grid: [1, 2]
+    max_features_grid: ["sqrt", "log2"]
+    class_weight: balanced
+  svm:
+    C_grid: [0.1, 1.0, 10.0, 100.0]
+    gamma_grid: ["scale", 0.01, 0.1]
+    class_weight: balanced
+    probability: true

@@ -1,0 +1,5 @@
+dataset,best_n_estimators,best_max_depth,best_min_samples_leaf,best_max_features,nested_balanced_accuracy,nested_roc_auc
+torres_torres,200,10,1,sqrt,0.5657331392389162,0.6733743985250268
+ibarra_zarate,200,10,1,sqrt,0.5,0.58848120288227
+raeisi,200,10,1,log2,0.6612998322576373,0.9363136504900789
+wang,200,10,2,sqrt,0.5560498854767071,0.7947862529571859
