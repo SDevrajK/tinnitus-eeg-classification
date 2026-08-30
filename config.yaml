@@ -308,3 +308,23 @@ tier2:
     n_repeats: 10             # permutation-importance repeats for the RBF SVM
     scoring: balanced_accuracy  # metric decreased by permutation (used for SVM importance)
     top_k: 20                 # number of top features to map/visualize per model+dataset (used by later subtasks)
+
+# Tier 3 (EEGNet-8,2 deep learning) configurable parameters — no hardcoded values.
+# Subject-grouped CV reuses the Tier 1/2 scheme (GroupKFold grouped by Subject_ID).
+# The EEGNet-8,2 architecture: F1=8 temporal filters, D=2 depth multiplier,
+# F2=16 pointwise filters (= F1*D), 64-sample temporal kernel (Lawhern et al. 2018,
+# "EEGNet: a compact convolutional neural network for EEG-based BCIs", J. Neural Eng.).
+# Hardware: the training script auto-detects CUDA and falls back to CPU (PRD §6).
+tier3:
+  cv_folds: 5                  # GroupKFold folds for subject-grouped CV
+  batch_size: 64               # training batch size
+  max_epochs: 50               # training epochs per CV fold (and final full-data refit)
+  learning_rate: 0.001         # AdamW learning rate
+  weight_decay: 0.0            # AdamW weight decay
+  eegnet:
+    F1: 8                      # temporal filters (the "8" in EEGNet-8,2)
+    D: 2                       # depth multiplier (the "2" in EEGNet-8,2)
+    F2: 16                     # pointwise filters (= F1 * D)
+    kernel_length: 64          # temporal kernel length in samples
+    drop_prob: 0.25            # dropout probability
+    pool_mode: mean            # temporal pooling mode
