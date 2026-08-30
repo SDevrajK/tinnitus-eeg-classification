@@ -28,6 +28,11 @@ def load_excluded_montage(config) -> dict:
     return config.get('excluded_subjects_montage', {})
 
 
+def load_excluded_duplicates(config) -> dict:
+    """Load the duplicate-recording exclusion map from config."""
+    return config.get('excluded_subjects_duplicates', {})
+
+
 def load_subject(dataset_key: str, subject_id: str, config: dict) -> mne.io.Raw:
     """
     Load and standardize raw EEG data for a single subject from a specific dataset.
@@ -104,6 +109,26 @@ def _load_raeisi(eeg_file: Path, config: dict) -> mne.io.Raw:
     data = np.load(eeg_file, mmap_mode='r')
     arr = data['arr_0']  # Shape: 63 x n_samples (float64)
     
+    # Trim the digitizer-startup artifact before ANY downstream processing.
+    # Each raeisi file begins with a run of zero samples (exactly 0.0 in the
+    # float64 files; ±0.01 quantization noise in the float32 re-saves) followed
+    # by a single-sample spike whose magnitude exceeds any EEG value. That spike
+    # is the front-end's first live sample while its DC-coupled input settles.
+    # We remove everything up to and including the spike so that neither the
+    # anti-aliasing low-pass in resample() nor the bandpass high-pass ever sees
+    # a step discontinuity (which the high-pass would ring on, contaminating the
+    # first ~2 s of the recording). The threshold is config-driven and applied
+    # in raw .npz units (NOT µV) on the un-scaled array.
+    threshold = float(config['preprocessing']['raeisi_trim_threshold'])
+    exceed = (np.abs(arr) > threshold).any(axis=0)
+    if not exceed.any():
+        raise ValueError(
+            f"{eeg_file.name}: no sample exceeds trim threshold {threshold}; "
+            "refusing to trim (unexpected file structure)"
+        )
+    spike_idx = int(np.argmax(exceed))  # first sample where ANY channel exceeds threshold
+    arr = arr[:, spike_idx + 1:]        # drop zeros (0..spike_idx-1) and the spike itself
+    
     # Get the ordered 63-name list of canonical names
     names = config['channel_mapping']['raeisi']
     
@@ -130,6 +155,9 @@ def main():
     # Load the montage exclusion map
     montage_excluded = load_excluded_montage(config)
     
+    # Load the duplicate-recording exclusion map
+    duplicate_excluded = load_excluded_duplicates(config)
+    
     total_subjects = 0
     total_files_written = 0
     
@@ -149,6 +177,11 @@ def main():
             # Check if subject should be excluded due to non-standard montage
             if subject_id in montage_excluded.get(dataset_key, []):
                 print(f"  {dataset_key} {subject_id}: EXCLUDED (non-standard channel montage)")
+                continue
+            
+            # Check if subject should be excluded as a duplicate recording
+            if subject_id in duplicate_excluded.get(dataset_key, []):
+                print(f"  {dataset_key} {subject_id}: EXCLUDED (duplicate recording)")
                 continue
             
             # Compute output path
@@ -173,6 +206,9 @@ def main():
     
     # Write montage exclusion log
     write_montage_exclusion_log(montage_excluded)
+    
+    # Write duplicate-recording exclusion log
+    write_duplicate_exclusion_log(duplicate_excluded)
 
 
 # Stub functions for the next subtasks (4.2 and 4.3)
@@ -272,6 +308,26 @@ def write_montage_exclusion_log(montage_excluded: dict):
                     'Subject_ID': subject_id,
                     'Dataset': dataset_key,
                     'Reason': 'non-standard channel montage'
+                })
+
+
+def write_duplicate_exclusion_log(duplicate_excluded: dict):
+    """Write a machine-readable log of duplicate-recording-excluded subjects."""
+    log_path = DERIVATIVES_DIR / "excluded_subjects_duplicates.csv"
+    
+    # Create the derivatives directory if needed
+    DERIVATIVES_DIR.mkdir(parents=True, exist_ok=True)
+    
+    with open(log_path, 'w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=['Subject_ID', 'Dataset', 'Reason'])
+        writer.writeheader()
+        
+        for dataset_key, subjects in duplicate_excluded.items():
+            for subject_id in subjects:
+                writer.writerow({
+                    'Subject_ID': subject_id,
+                    'Dataset': dataset_key,
+                    'Reason': 'duplicate recording'
                 })
 
 

@@ -185,6 +185,13 @@ preprocessing:
   # downsampled to it BEFORE filtering/artifact-rejection so τ=1 sample means
   # a consistent physical time lag across datasets.
   resample_sfreq: 256.0
+  # raeisi onset-trim threshold, in raw .npz units (NOT µV). Each raeisi file
+  # begins with a run of zero samples — exactly 0.0 in the float64 files, but
+  # ±0.01 quantization noise in the float32 re-saves — followed by a single
+  # digitizer-startup spike whose magnitude exceeds any EEG value. The first
+  # sample where ANY channel's |value| exceeds this threshold is the spike;
+  # everything up to and including it is trimmed before resampling/filtering.
+  raeisi_trim_threshold: 1.0
 
 # Subjects excluded for non-standard channel montage. These use a different
 # electrode layout (fronto-central subset) that cannot be reduced to the 13
@@ -195,6 +202,26 @@ excluded_subjects_montage:
     - P18G2
     - P4G5
     - P5G5
+
+# Subjects excluded as duplicate recordings. Verified in Phase 2 by loading the
+# raw files and comparing them: raeisi T11-T20 are float32 re-saves of T1-T10
+# (Pearson r = 1.0000, slope 1.0, offset ~0 — the same 10 tinnitus recordings
+# re-saved at lower precision), and raeisi H14 is byte-identical to H13. These
+# are dropped so the analytic sample reflects unique recordings (15 control /
+# 10 tinnitus) rather than file-level duplicates (16/20).
+excluded_subjects_duplicates:
+  raeisi:
+    - T11
+    - T12
+    - T13
+    - T14
+    - T15
+    - T16
+    - T17
+    - T18
+    - T19
+    - T20
+    - H14
 
 # Quality-control figure generation (PRD FR12 / AC6).
 # Sample N subjects per (dataset, group) and plot their PSD.
@@ -237,7 +264,7 @@ plzc:
 phase4:
   alpha: 0.05          # FDR significance level (Benjamini-Hochberg)
   n_permutations: 10000  # permutation t-test null-distribution size
-  n_bootstrap: 1000      # coefficient-stability bootstrap resamples (PRD requires >=1000)
+  n_bootstrap: 2000      # coefficient-stability bootstrap resamples (PRD requires >=1000)
   epoch_cap: 90          # LODO subject-stratified epoch cap; 90 preserves ~100% of Datasets A/B while trimming the long tails of C/D (PRD FR13)
   n_jobs: -1             # parallel workers for permutation/bootstrap loops (-1 = all cores)
 
@@ -249,7 +276,7 @@ tier1:
   elastic_net:
     l1_ratio_grid: [0.0, 0.1, 0.3, 0.5, 0.7, 0.9, 1.0]   # L1 ratio candidates (0 = L2/ridge, 1 = L1/lasso)
     alpha_grid: [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0]     # SGD regularization strength candidates
-    max_iter: 1000
+    max_iter: 2000
     tol: 0.001
     scoring: balanced_accuracy
   lodo:
