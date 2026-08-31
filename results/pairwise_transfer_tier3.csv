@@ -1,0 +1,13 @@
+source,target,tier,model,balanced_accuracy,roc_auc
+torres_torres,ibarra_zarate,tier3,eegnet,0.49818206280317895,0.4064162559336916
+torres_torres,raeisi,tier3,eegnet,0.4986531986531986,0.44986332654988004
+torres_torres,wang,tier3,eegnet,0.5,0.4733996587828282
+ibarra_zarate,torres_torres,tier3,eegnet,0.5001840876436782,0.47863820043103444
+ibarra_zarate,raeisi,tier3,eegnet,0.5057365764111978,0.6180705633665707
+ibarra_zarate,wang,tier3,eegnet,0.5,0.4998275404309667
+raeisi,torres_torres,tier3,eegnet,0.5,0.5019374102011495
+raeisi,ibarra_zarate,tier3,eegnet,0.5,0.643537211887992
+raeisi,wang,tier3,eegnet,0.5,0.5226956995299081
+wang,torres_torres,tier3,eegnet,0.5022404813218391,0.4712755926724138
+wang,ibarra_zarate,tier3,eegnet,0.5000666755567409,0.7103161915095173
+wang,raeisi,tier3,eegnet,0.5,0.5112954541591531
