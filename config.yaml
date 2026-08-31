@@ -308,6 +308,15 @@ tier2:
     n_repeats: 10             # permutation-importance repeats for the RBF SVM
     scoring: balanced_accuracy  # metric decreased by permutation (used for SVM importance)
     top_k: 20                 # number of top features to map/visualize per model+dataset (used by later subtasks)
+  lodo:
+    random_forest:
+      n_estimators: 200
+      max_depth: null
+      min_samples_leaf: 1
+      max_features: "sqrt"
+    svm:
+      C: 1.0
+      gamma: "scale"
 
 # Tier 3 (EEGNet-8,2 deep learning) configurable parameters — no hardcoded values.
 # Subject-grouped CV reuses the Tier 1/2 scheme (GroupKFold grouped by Subject_ID).
