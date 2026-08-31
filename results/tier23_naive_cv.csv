@@ -1,0 +1,13 @@
+dataset,tier,model,balanced_accuracy,roc_auc
+torres_torres,tier2,random_forest,1.0,1.0
+torres_torres,tier2,svm,0.9721937859195402,0.9959545617816092
+torres_torres,tier3,eegnet,0.7830235272988506,0.9301566989942529
+ibarra_zarate,tier2,random_forest,1.0,1.0
+ibarra_zarate,tier2,svm,0.9596470255638646,0.9957206688824078
+ibarra_zarate,tier3,eegnet,0.6148698594516309,0.9139476997062808
+raeisi,tier2,random_forest,1.0,1.0
+raeisi,tier2,svm,0.9992045840669693,0.9999969110060853
+raeisi,tier3,eegnet,0.7073841334360158,0.9869697235989549
+wang,tier2,random_forest,1.0,1.0
+wang,tier2,svm,0.9951619908915577,0.9998637083260243
+wang,tier3,eegnet,0.5676539093320846,0.7789950090085707
