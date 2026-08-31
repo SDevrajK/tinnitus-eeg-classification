@@ -69,9 +69,9 @@ def main():
             ax.set_xticklabels(dataset_labels)
             ax.set_yticklabels(dataset_labels)
             
-            # Set labels
-            if i == 0:
-                ax.set_title(model_labels[j])
+            # Set labels (title includes both model and metric so rows are self-explanatory)
+            metric_label = "bal_acc" if i == 0 else "AUC-ROC"
+            ax.set_title(f"{model_labels[j]} — {metric_label}")
             if j == 0:
                 ax.set_ylabel("source")
             if i == 1:
