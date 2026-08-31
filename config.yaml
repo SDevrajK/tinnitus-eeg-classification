@@ -318,9 +318,10 @@ tier2:
 tier3:
   cv_folds: 5                  # GroupKFold folds for subject-grouped CV
   batch_size: 64               # training batch size
-  max_epochs: 50               # training epochs per CV fold (and final full-data refit)
+  max_epochs: 100              # training epochs per CV fold (and final full-data refit) # raised for better convergence
   learning_rate: 0.001         # AdamW learning rate
   weight_decay: 0.0            # AdamW weight decay
+  class_weight: balanced       # balance the cross-entropy loss (consistent with Tiers 1–2)
   eegnet:
     F1: 8                      # temporal filters (the "8" in EEGNet-8,2)
     D: 2                       # depth multiplier (the "2" in EEGNet-8,2)

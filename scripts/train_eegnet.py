@@ -63,6 +63,12 @@ def evaluate(model, X_val, y_val, device) -> tuple[float, float]:
         
     return ba, auc
 
+def balanced_class_weights(y: np.ndarray) -> np.ndarray:
+    """Return sklearn 'balanced' class weights for a binary label vector y (values 0/1)."""
+    counts = np.bincount(y)
+    # sklearn 'balanced' semantics: n_samples / (n_classes * count_per_class)
+    return len(y) / (len(counts) * counts)
+
 def main():
     config = load_config()
     t3 = config["tier3"]
@@ -71,6 +77,7 @@ def main():
     max_epochs = int(t3["max_epochs"])
     lr = float(t3["learning_rate"])
     weight_decay = float(t3["weight_decay"])
+    class_weight = t3["class_weight"]
     eg = t3["eegnet"]
     
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -104,7 +111,12 @@ def main():
             
             model = build_model(n_chans, n_times, eg).to(device)
             optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
-            criterion = nn.CrossEntropyLoss()
+            y_train_labels = y[train_idx]
+            if class_weight == "balanced":
+                w = balanced_class_weights(y_train_labels)
+                criterion = nn.CrossEntropyLoss(weight=torch.tensor(w, dtype=torch.float32).to(device))
+            else:
+                criterion = nn.CrossEntropyLoss()
             
             train_ds = EpochTensorDataset(X[train_idx], y[train_idx])
             train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
@@ -139,7 +151,12 @@ def main():
         full_loader = DataLoader(full_ds, batch_size=batch_size, shuffle=True)
         
         optimizer = optim.AdamW(final_model.parameters(), lr=lr, weight_decay=weight_decay)
-        criterion = nn.CrossEntropyLoss()
+        y_train_labels = y
+        if class_weight == "balanced":
+            w = balanced_class_weights(y_train_labels)
+            criterion = nn.CrossEntropyLoss(weight=torch.tensor(w, dtype=torch.float32).to(device))
+        else:
+            criterion = nn.CrossEntropyLoss()
         
         for epoch in range(max_epochs):
             train_one_epoch(final_model, full_loader, optimizer, criterion, device)
