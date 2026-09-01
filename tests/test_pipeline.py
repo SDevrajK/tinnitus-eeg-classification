@@ -18,8 +18,7 @@ from preprocess_raw import preprocess_raw
 from extract_power import extract_band_power
 from extract_wpli import extract_wpli
 from extract_plzc import extract_plzc
-from _common import RANDOM_SEED
-from sklearn.ensemble import RandomForestClassifier
+from train_random_forest import build_random_forest
 from sklearn.metrics import balanced_accuracy_score
 
 
@@ -136,13 +135,8 @@ def test_model_training_stage_runs(fixture_epochs, subjects_groups, config):
     assert len(y) == len(df)
     assert set(np.unique(y)) == {0, 1}
     
-    # Construct and train classifier
-    rf_cfg = config["tier2"]["random_forest"]
-    clf = RandomForestClassifier(
-        n_estimators=int(rf_cfg["n_estimators_grid"][0]),
-        class_weight=rf_cfg["class_weight"],
-        random_state=RANDOM_SEED
-    )
+    # Construct and train classifier (reuse the real training script's model builder)
+    clf = build_random_forest(config)
     clf.fit(X, y)
     y_pred = clf.predict(X)
     acc = balanced_accuracy_score(y, y_pred)

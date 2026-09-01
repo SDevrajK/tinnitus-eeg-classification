@@ -18,6 +18,13 @@ FEATURE_PREFIXES = ("power_", "wpli_", "plzc_")
 def feature_columns(df):
     return [col for col in df.columns if any(col.startswith(prefix) for prefix in FEATURE_PREFIXES)]
 
+
+def build_random_forest(config) -> RandomForestClassifier:
+    """Build a Tier-2 RandomForestClassifier from config (the base model used by main's grid search)."""
+    rf_cfg = config["tier2"]["random_forest"]
+    return RandomForestClassifier(class_weight=rf_cfg["class_weight"], random_state=RANDOM_SEED)
+
+
 def main():
     config = load_config()
     cv_folds = int(config["tier2"]["cv_folds"])
@@ -30,7 +37,6 @@ def main():
         "min_samples_leaf": list(rf_cfg["min_samples_leaf_grid"]),
         "max_features": list(rf_cfg["max_features_grid"])
     }
-    class_weight = rf_cfg["class_weight"]
 
     MODELS_DIR = RESULTS_DIR / "models"
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
@@ -46,7 +52,7 @@ def main():
         y = (df["Group"] == "Tinnitus").astype(int).to_numpy()
         groups = df["Subject_ID"].to_numpy()
 
-        base = RandomForestClassifier(class_weight=class_weight, random_state=RANDOM_SEED)
+        base = build_random_forest(config)
 
         # Nested CV
         outer = GroupKFold(n_splits=cv_folds)
