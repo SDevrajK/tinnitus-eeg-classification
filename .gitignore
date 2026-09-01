@@ -22,3 +22,6 @@ __pycache__/
 
 # all specs are gitignored
 specs/
+
+# Test fixture — committed despite the global *.fif ignore (PRD FR2, AC7)
+!tests/fixtures/*.fif
