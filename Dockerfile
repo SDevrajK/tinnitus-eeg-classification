@@ -14,6 +14,10 @@ RUN conda env create -f environment.yml
 RUN conda run -n tinnitus-eeg pip install scikit-learn joblib torch --index-url https://download.pytorch.org/whl/cpu
 RUN conda run -n tinnitus-eeg pip install braindecode captum shap
 
+# Install test dependencies
+RUN conda run -n tinnitus-eeg pip install pytest
+RUN conda run -n tinnitus-eeg pip install git+https://github.com/SDevrajK/eeg-processor.git
+
 # Copy the entire repository into the image
 COPY . .
 
