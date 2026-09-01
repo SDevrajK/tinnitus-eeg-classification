@@ -1,6 +1,11 @@
 # Central configuration for Tinnitus EEG Phase 2 preprocessing.
 # All configurable parameters (channel mapping, thresholds, flags, paths) live here.
 
+# Machine-specific data location — the only path that varies between machines.
+# BIDS root, derivatives, and features all derive from it (see scripts/_common.py).
+paths:
+  data_root: /home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data
+
 channel_mapping:
   # Dataset A — torres_torres (32 channels). Native labels already standard;
   # case-normalize FP->Fp. EOG1/EOG2 are non-scalp and are EXCLUDED (omitted here).

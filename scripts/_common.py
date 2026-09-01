@@ -5,21 +5,27 @@ import yaml
 import json
 import pandas as pd
 
-PROJECT_ROOT = Path("/home/sdevrajk/projects/personal/MachineLearning")
+# Repo root derived from this file's location — portable across machines and inside the Docker container.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = PROJECT_ROOT / "config.yaml"
-BIDS_ROOT = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data/bids_organized")
-DERIVATIVES_DIR = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data/derivatives")
-PREPROCESSED_DIR = DERIVATIVES_DIR / "preprocessed"
-SHARED_CHANNELS_PATH = DERIVATIVES_DIR / "shared_channels.json"
-INVENTORY_CSV = BIDS_ROOT / "inventory.csv"
-FEATURES_DIR = Path("/home/sdevrajk/media-hdd/researchdata/personal/MachineLearning/data/features")
-SCALED_FEATURES_DIR = FEATURES_DIR / "scaled"
 
 
 def load_config() -> dict:
     """Load the central configuration from YAML."""
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
+
+
+# Data root is the only machine-specific path; it lives in config.yaml (single source of truth).
+# BIDS, derivatives, and features all derive from it.
+_DATA_ROOT = Path(load_config()["paths"]["data_root"])
+BIDS_ROOT = _DATA_ROOT / "bids_organized"
+DERIVATIVES_DIR = _DATA_ROOT / "derivatives"
+PREPROCESSED_DIR = DERIVATIVES_DIR / "preprocessed"
+SHARED_CHANNELS_PATH = DERIVATIVES_DIR / "shared_channels.json"
+INVENTORY_CSV = BIDS_ROOT / "inventory.csv"
+FEATURES_DIR = _DATA_ROOT / "features"
+SCALED_FEATURES_DIR = FEATURES_DIR / "scaled"
 
 
 def load_shared_channels() -> list[str]:
