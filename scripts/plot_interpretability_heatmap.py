@@ -3,7 +3,6 @@
 Generate cross-tier interpretability summary heatmap.
 """
 
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from _common import RESULTS_DIR, FIGURES_DIR

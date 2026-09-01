@@ -90,13 +90,13 @@ def main():
     # Combine handles and labels from both axes and remove duplicates
     unique_handles_labels = []
     seen = set()
-    for h, l in zip(handles, labels):
-        if l not in seen:
-            unique_handles_labels.append((h, l))
-            seen.add(l)
+    for h, label in zip(handles, labels):
+        if label not in seen:
+            unique_handles_labels.append((h, label))
+            seen.add(label)
     
     # Create the legend with all unique entries
-    fig.legend([h for h, l in unique_handles_labels], [l for h, l in unique_handles_labels], 
+    fig.legend([h for h, label in unique_handles_labels], [label for h, label in unique_handles_labels], 
                loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=6, frameon=True)
     
     # Add overall title

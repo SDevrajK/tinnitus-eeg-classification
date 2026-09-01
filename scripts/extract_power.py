@@ -2,7 +2,6 @@
 
 import numpy as np
 import mne
-from _common import load_config
 
 def compute_welch_psd(epochs: mne.Epochs, config: dict) -> tuple[np.ndarray, np.ndarray]:
     """Compute per-epoch Welch PSD with configurable window/overlap; returns (psd, freqs)."""

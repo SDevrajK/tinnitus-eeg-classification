@@ -8,7 +8,7 @@ import pandas as pd
 import torch
 from sklearn.metrics import balanced_accuracy_score, roc_auc_score
 from torch.utils.data import DataLoader
-from _common import load_config, RANDOM_SEED, RESULTS_DIR
+from _common import load_config, RESULTS_DIR
 from eegnet_data import build_dataset, EpochTensorDataset
 from train_eegnet import build_model
 

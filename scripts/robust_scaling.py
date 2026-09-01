@@ -1,9 +1,8 @@
 """Apply robust scaling (median + IQR) to the engineered feature matrices."""
 
 import numpy as np
-import pandas as pd
 from sklearn.preprocessing import RobustScaler
-from _common import FEATURES_DIR, SCALED_FEATURES_DIR, load_config, load_features
+from _common import SCALED_FEATURES_DIR, load_config, load_features
 
 FEATURE_PREFIXES = ("power_", "wpli_", "plzc_")
 

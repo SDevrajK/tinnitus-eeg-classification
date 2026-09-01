@@ -4,7 +4,6 @@ Evaluates model trained on one dataset and tested on another, reporting
 balanced accuracy and AUC-ROC for all 12 ordered pairs.
 """
 
-import numpy as np
 import pandas as pd
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import balanced_accuracy_score, roc_auc_score

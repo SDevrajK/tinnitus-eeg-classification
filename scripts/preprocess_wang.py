@@ -139,7 +139,6 @@ def save_wang_epochs(epochs, subject_id) -> int:
 def main():
     """Main pipeline for Dataset D: load, standardize, and save preprocessed epochs."""
     config = load_config()
-    shared_channels = load_shared_channels()
     excluded_subjects = load_excluded_subject_ids()
     
     # Find all subjects in Dataset D

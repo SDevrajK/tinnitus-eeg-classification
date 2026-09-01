@@ -12,7 +12,7 @@ problem by:
 Dataset keys in fixed order: ("torres_torres", "ibarra_zarate", "raeisi", "wang")
 """
 import numpy as np
-from _common import load_scaled_features, load_config, EPOCH_DROP_SEED
+from _common import load_scaled_features
 from eegnet_data import build_dataset
 
 # Fixed dataset order

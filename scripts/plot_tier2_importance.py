@@ -3,7 +3,6 @@ Generates Tier 2 (RF + SVM) feature-importance bar-chart figures with physical f
 """
 
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 from _common import load_config, RESULTS_DIR, FIGURES_DIR
 
@@ -64,7 +63,7 @@ def main():
             importances = subset["importance"].values
             
             # Draw horizontal bar chart
-            bars = ax.barh(labels, importances, color=[feature_type_colors[row["feature_type"]] for _, row in subset.iterrows()])
+            ax.barh(labels, importances, color=[feature_type_colors[row["feature_type"]] for _, row in subset.iterrows()])
             
             # Set labels and title
             ax.set_title(f"{display_label} — {model_title}")

@@ -6,11 +6,9 @@ channels for each dataset. Each figure displays one dataset with its first
 subject's data.
 """
 
-import os
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import numpy as np
 from _common import load_config, PROJECT_ROOT
 from load_epochs import load_dataset_epochs
 from extract_plzc import extract_plzc

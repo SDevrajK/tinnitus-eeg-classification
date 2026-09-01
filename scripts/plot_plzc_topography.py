@@ -5,11 +5,10 @@ import pandas as pd
 import mne
 import matplotlib.pyplot as plt
 import pingouin as pg
-from _common import load_config, load_features, load_shared_channels, FIGURES_DIR, RESULTS_DIR
+from _common import load_features, load_shared_channels, FIGURES_DIR, RESULTS_DIR
 
 
 def main() -> None:
-    config = load_config()
     channels = load_shared_channels()
     n_ch = len(channels)
     fdr_results = pd.read_csv(RESULTS_DIR / "permutation_ttest.csv")

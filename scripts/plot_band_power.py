@@ -8,7 +8,6 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-from pathlib import Path
 
 from _common import load_config, PROJECT_ROOT
 from load_epochs import load_dataset_epochs

@@ -6,7 +6,7 @@ and write shared_channels.json with the final shared channel list and count.
 
 import json
 
-from _common import CONFIG_PATH, DERIVATIVES_DIR, load_config
+from _common import DERIVATIVES_DIR, load_config
 
 # Named constants
 OUTPUT_PATH = DERIVATIVES_DIR / "shared_channels.json"

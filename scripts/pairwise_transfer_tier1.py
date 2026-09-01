@@ -2,7 +2,6 @@
 Tier 1 elastic-net pairwise cross-dataset transfer (12 ordered pairs), reusing trained models.
 """
 
-import numpy as np
 import pandas as pd
 import joblib
 from sklearn.metrics import balanced_accuracy_score, roc_auc_score

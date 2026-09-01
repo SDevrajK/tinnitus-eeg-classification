@@ -5,7 +5,6 @@ This script evaluates Random Forest and RBF SVM models in a Leave-One-Dataset-Ou
 configuration using 4 held-out dataset configurations. It implements subject-stratified
 epoch capping (max 90 epochs per subject) and class weighting as required by the PRD.
 """
-import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC

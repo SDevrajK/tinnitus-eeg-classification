@@ -4,7 +4,6 @@ Creates truncated epoch files from preprocessed data for reproducible testing.
 See PRD §5 FR1-2, AC1, AC7.
 """
 import csv
-from pathlib import Path
 
 import mne
 

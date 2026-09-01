@@ -72,7 +72,7 @@ def main():
                 if model in dataset_data["model"].values:
                     value = dataset_data[dataset_data["model"] == model][metric].iloc[0]
                     x_pos = group_positions[j] - group_width/2 + k * bar_width
-                    bar = ax.bar(x_pos, value, bar_width, 
+                    ax.bar(x_pos, value, bar_width, 
                                label=model_display[model], color=colors[model], 
                                edgecolor='black', linewidth=0.2)
                     
