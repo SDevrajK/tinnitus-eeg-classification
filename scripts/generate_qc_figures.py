@@ -13,7 +13,7 @@ import mne
 
 from _common import PROJECT_ROOT, PREPROCESSED_DIR, INVENTORY_CSV, load_config
 
-FIGURES_DIR = PROJECT_ROOT / "specs" / "tinnitus-eeg-interpretability" / "phase2" / "figures"
+FIGURES_DIR = PROJECT_ROOT / "figures" / "qc"
 DATASET_KEYS = ("torres_torres", "ibarra_zarate", "raeisi", "wang")
 
 

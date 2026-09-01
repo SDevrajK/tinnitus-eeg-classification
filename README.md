@@ -1,10 +1,14 @@
 # Tinnitus EEG Classification: Power/Interpretability Tradeoff & Cross-Dataset Generalization
 
+[![CI](https://github.com/SDevrajK/tinnitus-eeg-classification/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SDevrajK/tinnitus-eeg-classification/actions/workflows/ci.yml)
+
 A reproducible machine-learning pipeline that classifies tinnitus vs. healthy controls from resting-state EEG across four public datasets, and that explicitly tests three methodological validity questions: subject-level leakage, cross-dataset generalization, and the interpretability-vs-complexity tradeoff.
 
 ## Summary
 
 This project builds a four-tier model comparison — statistical baseline, sparse linear, classical nonlinear, and deep learning — and evaluates every predictive tier with the same rigorous validation schemes. The headline findings are sobering and reproducible: (1) engineered-feature models reach *perfect* accuracy under naive (leaky) cross-validation and collapse toward chance once subjects are separated between train and test; (2) no tier generalizes across independently collected datasets (pairwise and leave-one-dataset-out transfer are both near chance); and (3) increased model complexity does **not** buy more generalizable interpretability — the models do not agree on which channels matter, either across model families or across recording sites.
+
+**Jump to:** [Datasets](#datasets) · [Methodology](#methodology) · [Leakage](#leakage-naive-vs-corrected-cross-validation) · [Cross-dataset generalization](#cross-dataset-generalization-pairwise-transfer--lodo) · [Confound check](#dataset-of-origin-confound-check) · [Interpretability](#interpretability-synthesis--complexity-tradeoff) · [Limitations](#limitations) · [Reproducibility](#reproducibility)
 
 ## Motivation
 
@@ -16,38 +20,24 @@ This project therefore measures, explicitly and quantitatively: (a) the accuracy
 
 ## Datasets
 
-Four independent public datasets, analyzed only in the resting-state, eyes-open condition:
+Four independent public datasets, restricted to the resting-state, eyes-open condition. Each dataset carries its own documented, published sample size, but not every documented subject survives this project's data-quality checks (a missing recording, a duplicate file, an incompatible electrode montage, or an insufficient amount of usable data). **The subject counts below are the analytic N actually used for feature extraction and every downstream model** — not the originally documented total — since that is the number that determines everything reported in this README from here on. The full accounting of what was excluded and why is in [Limitations](#limitations).
 
-- **Dataset A** — Torres-Torres et al., "Characterization of Tinnitus Through the Analysis of Electroencephalographic Activity," Mendeley Data, DOI 10.17632/fj7sskjdt7.5 (CC BY 4.0). 37 subjects (15 control / 22 tinnitus).
-- **Dataset B** — Ibarra-Zárate et al., "Acoustic Therapies for Tinnitus Treatment: An EEG Database," Mendeley Data, DOI 10.17632/kj443jc4yc (CC BY 4.0). 103 subjects (14 control / 89 tinnitus); week-1 (pre-treatment) baseline session only.
-- **Dataset C** — Raeisi, "EEG signal dataset in a resting state for individuals with tinnitus and healthy individuals," Zenodo, DOI 10.5281/zenodo.13308645 (CC BY 4.0). 36 subjects (16 control / 20 tinnitus).
-- **Dataset D** — Wang et al., "Cross-Subject Tinnitus Diagnosis Based on Multi-Band EEG Contrastive Representation Learning," IEEE Journal of Biomedical and Health Informatics 2023, DOI 10.1109/JBHI.2023.3264521 (distributed via the authors' Google Drive). 267 acquired subjects (238 analytic after a 90 s minimum-data-length exclusion).
+- **Dataset A** — Torres-Torres et al., "Characterization of Tinnitus Through the Analysis of Electroencephalographic Activity," Mendeley Data, DOI 10.17632/fj7sskjdt7.5 (CC BY 4.0). **37 subjects (15 control / 22 tinnitus)** — no exclusions.
+- **Dataset B** — Ibarra-Zárate et al., "Acoustic Therapies for Tinnitus Treatment: An EEG Database," Mendeley Data, DOI 10.17632/kj443jc4yc (CC BY 4.0); week-1 (pre-treatment) baseline session only. Documented as 103 subjects; 2 have no baseline recording at all and 3 more use an incompatible electrode montage (see [Limitations](#limitations)). **98 analytic subjects (14 control / 84 tinnitus).**
+- **Dataset C** — Raeisi, "EEG signal dataset in a resting state for individuals with tinnitus and healthy individuals," Zenodo, DOI 10.5281/zenodo.13308645 (CC BY 4.0). Documented as 36 subjects; 11 are duplicate recordings removed during preprocessing (see [Limitations](#limitations)). **25 analytic subjects (15 control / 10 tinnitus).**
+- **Dataset D** — Wang et al., "Cross-Subject Tinnitus Diagnosis Based on Multi-Band EEG Contrastive Representation Learning," IEEE Journal of Biomedical and Health Informatics 2023, DOI 10.1109/JBHI.2023.3264521 (distributed via the authors' Google Drive). 267 acquired subjects; 29 excluded for under 90 s of usable post-artifact-rejection data (see [Limitations](#limitations)). **238 analytic subjects (65 control / 173 tinnitus).**
 
-All cross-dataset analyses are restricted to the intersection of the **13 shared 10-20 channels** present in all four datasets: C3, C4, F3, F4, F7, F8, Fp1, Fp2, Fz, P7, P8, T7, T8.
+All cross-dataset analyses (pairwise transfer, LODO, the dataset-of-origin confound check, and the interpretability agreement analysis) are restricted to the intersection of the **13 shared 10-20 channels** present in all four datasets: C3, C4, F3, F4, F7, F8, Fp1, Fp2, Fz, P7, P8, T7, T8.
 
 ## Methodology
 
+**Preprocessing.** All four datasets' native formats (GDF/SET for A/B, NPZ for C, already-epoched EEGLAB SET/FDT for D) are loaded into a consistent MNE representation. Datasets A, B, and C are bandpass-filtered (0.5–45 Hz) and notch-filtered (50 Hz) with automated, non-manual artifact rejection; Dataset D is used as distributed, since it arrives already filtered, artifact-rejected, and epoched by Wang et al. (2023)'s own pipeline. All continuous recordings are segmented into fixed 2-second epochs (Dataset D keeps its own existing epoch boundaries).
+
 **Four model tiers.** Tier 0 (statistical baseline): per-feature permutation *t*-tests with Benjamini–Hochberg FDR correction. Tier 1 (sparse linear): elastic-net-regularized logistic regression. Tier 2 (classical nonlinear): Random Forest and RBF-kernel Support Vector Machine. Tier 3 (deep learning): EEGNet-8,2 (Lawhern et al. 2018) trained directly on minimally processed epoch time series.
 
-**Features (Tiers 0–2).** Per epoch and per shared channel: band power in five canonical bands (delta 1–4 Hz, theta 4–8 Hz, alpha 8–13 Hz, beta 13–30 Hz, gamma 30–45 Hz), weighted phase-lag index (wPLI) connectivity between every channel pair per band, and permutation Lempel-Ziv complexity (PLZC). Tier 3 ingests the raw (minimally processed) 2-second epochs directly.
+**Features (Tiers 0–2).** Per epoch and per shared channel (13 channels): band power in five canonical bands (delta 1–4 Hz, theta 4–8 Hz, alpha 8–13 Hz, beta 13–30 Hz, gamma 30–45 Hz — 65 features), weighted phase-lag index (wPLI) connectivity between every channel pair per band (78 pairs × 5 bands = 390 features), and permutation Lempel-Ziv complexity (PLZC) per channel, broadband (13 features). **468 features per epoch in total**, following a `{family}_{band}_{channel(s)}` naming scheme, e.g. `power_alpha_C3`, `wpli_beta_F3_F4`, `plzc_Fz`. Tier 3 bypasses this feature matrix entirely and ingests the raw (minimally processed) 2-second epochs directly.
 
 **Validation.** Every predictive tier is evaluated three ways: (1) *within-dataset* — naive epoch-level cross-validation vs. corrected subject-grouped cross-validation, reporting balanced accuracy and AUC-ROC; (2) *pairwise cross-dataset transfer* — train on one dataset, test on another, for all 12 ordered pairs; and (3) *leave-one-dataset-out (LODO)* — train on the union of three datasets, test on the fully held-out fourth. Hyperparameter selection uses nested, subject-grouped cross-validation with fixed random seeds throughout, so the whole pipeline is reproducible.
-
-## Pipeline run order
-
-All scripts live in `scripts/` and are run with `scripts/` as the working directory under `conda activate tinnitus-eeg`.
-
-| Phase | Scripts |
-|-------|---------|
-| Phase 3 — feature extraction | `build_feature_matrix.py` |
-| Phase 4 — Tier 0 (statistical) | `permutation_ttest.py`, `plot_topography.py`, `plot_wpli_heatmap.py`, `plot_plzc_topography.py` |
-| Phase 4 — Tier 1 (linear) | `robust_scaling.py`, `train_elastic_net.py`, `extract_coefficients.py`, `within_dataset_cv.py`, `pairwise_transfer.py`, `lodo_transfer.py`, `dataset_of_origin.py`, `bootstrap_stability.py`, `cross_dataset_figure.py` |
-| Phase 5 — Tier 2 (nonlinear) | `train_random_forest.py`, `train_svm.py`, `within_dataset_naive_cv.py`, `within_dataset_corrected_cv.py`, `compute_tier2_importance.py`, `map_tier2_importance.py`, `plot_tier2_importance.py` |
-| Phase 5 — Tier 3 (deep) | `train_eegnet.py`, `compute_eegnet_saliency.py`, `extract_eegnet_spatial_filters.py`, `plot_eegnet_interpretability.py` |
-| Phase 5 — validation + confound | `pairwise_transfer_tier{1,2,3}.py`, `lodo_transfer_tier{2,3}.py`, `dataset_of_origin_rf.py` |
-| Phase 5 — figures + synthesis | `plot_naive_vs_corrected.py`, `plot_pairwise_transfer.py`, `plot_lodo_transfer.py`, `plot_dataset_of_origin.py`, `synthesize_interpretability.py`, `plot_interpretability_heatmap.py`, `assess_interpretability_agreement.py` |
-
-Acquisition/organization/one-time utilities (not part of the analysis pipeline): `organize_bids.py`, `generate_inventory.py`, `compute_shared_channels.py`, `preprocess_wang.py` (Dataset D), `exclude_subjects.py`, `generate_qc_figures.py`.
 
 ## Leakage: naive vs. corrected cross-validation
 
@@ -131,9 +121,39 @@ Agreement, measured by Spearman rank correlation and top-5 channel overlap:
 
 **No.** Increasing model complexity (Tier 3 vs. Tiers 0–1) does not yield more generalizable interpretability. The channels flagged as important in one dataset are not reliably flagged in the others, and the model families only partially agree even within a dataset. Combined with the near-chance cross-dataset generalization, the evidence is that the higher-complexity models — and, to a large extent, the simpler ones too — are fitting dataset-specific signal rather than discovering stable, generalizable neural markers of tinnitus. For this task, on this data, model complexity buys neither better generalization nor more trustworthy explanations.
 
-## Reproducibility (Docker)
+## Limitations
 
-The pipeline runs end-to-end from **cleaned data** (the preprocessed `.fif` epochs and feature matrices already present); raw-data acquisition is a separate, partly manual step and is not part of the containerized run.
+This project tries to be candid about known data-quality and methodological caveats — consistent with its own thesis that the tinnitus-EEG literature under-reports exactly this kind of limitation. None of the items below change the headline findings above; they are documented so a reader can independently judge the reliability of each dataset's contribution to those findings.
+
+- **Dataset B: permanent 2-subject gap + 3-subject montage exclusion.** Two subjects (`G1-Placebo/P2`, `G2-BBT/P1`) have no week-1 baseline recording in the raw source at all — a gap in the original data, not a processing artifact, and not recoverable. Three further subjects (`P18G2`, `P4G5`, `P5G5`) use a non-standard fronto-central electrode montage that cannot be reduced to the 13-channel shared set and are excluded from all processing. Net effect: 103 documented subjects → 98 analytic (14 control / 84 tinnitus).
+- **Dataset C: 11 duplicate recordings.** Ten tinnitus recordings (`T11`–`T20`) are float32 re-saves of `T1`–`T10` (Pearson r = 1.0000 against the originals), and one control recording (`H14`) is byte-identical to `H13`. All 11 are dropped so the analytic sample reflects unique recordings only: 36 documented subjects → 25 analytic (15 control / 10 tinnitus).
+- **Dataset C: eyes-open/eyes-closed condition is an unconfirmed working assumption.** Each subject's file contains a single ~5-minute segment with no embedded event markers or condition labels. The dataset depositor was contacted to confirm the condition; as of this writing, no response has been received. This project proceeds on the working assumption that the segment is eyes-open, consistent with the dataset's stated resting-state design. If this assumption is later found to be wrong, Dataset C's role in every cross-dataset analysis (pairwise transfer, LODO, dataset-of-origin, interpretability agreement) would need to be revisited, since eyes-open vs. eyes-closed is itself a well-documented EEG confound (posterior alpha power is substantially enhanced with eyes closed; Barry et al., 2007, *Clinical Neurophysiology*).
+- **Dataset D: residual duration confound.** Even after excluding the 29 subjects with under 90 s of usable post-artifact-rejection data, retained Control subjects still have systematically less usable data than retained Tinnitus subjects (median 106 s vs. 192 s, measured across all 267 acquired subjects before exclusion). A stricter duration cutoff would have disproportionately removed Dataset D's already-scarce control group, so this confound is documented rather than fully corrected.
+- **No scripted data acquisition.** Datasets A–C currently require a manual download from their respective repositories, and Dataset D requires manually placing its already-acquired files in the expected directory layout (see [Reproducibility](#reproducibility)). Only the analysis pipeline itself (feature extraction onward) is fully scripted and containerized end to end.
+
+## Reproducibility
+
+**Continuous integration.** Every push and pull request to `main` lints the codebase (`ruff`) and builds the Docker image below, then runs a pytest smoke-test suite (`tests/test_pipeline.py`) inside the container against a small committed fixture (`tests/fixtures/`) spanning preprocessing → feature extraction → model training. See the badge at the top of this README or [`.github/workflows/ci.yml`](.github/workflows/ci.yml). This is deliberately a smoke test, not a large unit-test bank — it confirms the pipeline still runs end to end after a change, not the correctness of every individual function.
+
+**Acquiring the raw data.** Datasets A–C are downloaded manually from the repositories cited in [Datasets](#datasets) above (Mendeley Data for A/B, Zenodo for C); there is no scripted downloader yet (see [Limitations](#limitations)). Dataset D has no versioned-repository API and must be manually placed under the data directory's `wang/` subfolder in the layout `organize_bids.py` expects, per the authors' own Google Drive distribution.
+
+**Pipeline scripts.** Once raw data is in place, the following scripts, run in order from `scripts/` under `conda activate tinnitus-eeg`, take it from raw files to every figure and table above:
+
+| Stage | Scripts |
+|-------|---------|
+| Organize / inventory raw data | `organize_bids.py`, `generate_inventory.py` |
+| Preprocess | `preprocess_raw.py` (Datasets A–C), `preprocess_wang.py` (Dataset D), `compute_shared_channels.py`, `exclude_subjects.py`, `generate_qc_figures.py` |
+| Feature extraction | `build_feature_matrix.py` |
+| Tier 0 (statistical) | `permutation_ttest.py`, `plot_topography.py`, `plot_wpli_heatmap.py`, `plot_plzc_topography.py` |
+| Tier 1 (linear) | `robust_scaling.py`, `train_elastic_net.py`, `extract_coefficients.py`, `within_dataset_cv.py`, `pairwise_transfer.py`, `lodo_transfer.py`, `dataset_of_origin.py`, `bootstrap_stability.py`, `cross_dataset_figure.py` |
+| Tier 2 (nonlinear) | `train_random_forest.py`, `train_svm.py`, `within_dataset_naive_cv.py`, `within_dataset_corrected_cv.py`, `compute_tier2_importance.py`, `map_tier2_importance.py`, `plot_tier2_importance.py` |
+| Tier 3 (deep) | `train_eegnet.py`, `compute_eegnet_saliency.py`, `extract_eegnet_spatial_filters.py`, `plot_eegnet_interpretability.py` |
+| Cross-dataset validation + confound check | `pairwise_transfer_tier{1,2,3}.py`, `lodo_transfer_tier{2,3}.py`, `dataset_of_origin_rf.py` |
+| Figures + synthesis | `plot_naive_vs_corrected.py`, `plot_pairwise_transfer.py`, `plot_lodo_transfer.py`, `plot_dataset_of_origin.py`, `synthesize_interpretability.py`, `plot_interpretability_heatmap.py`, `assess_interpretability_agreement.py` |
+
+`run_pipeline.sh` runs the feature-extraction-through-synthesis stages (everything from `build_feature_matrix.py` onward) in this order automatically.
+
+**Docker.** The container runs the pipeline end-to-end starting from *cleaned data* (preprocessed `.fif` epochs and feature matrices already present, per the Preprocess stage above); raw-data acquisition itself is the separate, partly manual step described above and is not part of the containerized run.
 
 Build the image:
 
@@ -151,15 +171,8 @@ docker run -it \
   tinnitus-eeg bash
 ```
 
-Inside the container, activate the environment and run the full pipeline (Phase 3 → Phase 5):
+Inside the container, activate the environment and run the full pipeline (feature extraction through interpretability synthesis):
 
 ```bash
 source activate tinnitus-eeg && cd scripts && bash ../run_pipeline.sh
 ```
-
-## Data corrections (Dataset C)
-
-Dataset C (raeisi) required two corrections before analysis, both configurable in `config.yaml`:
-
-- **De-duplication** — `excluded_subjects_duplicates.raeisi` drops T11–T20 (float32 re-saves of T1–T10) and H14 (byte-identical to H13), so the analytic raeisi sample is 15 control / 10 tinnitus (25 unique subjects).
-- **Onset trimming** — `preprocess_raw.py` trims the leading zero samples and the single digitizer-startup spike (via `preprocessing.raeisi_trim_threshold`) before resampling/filtering.
